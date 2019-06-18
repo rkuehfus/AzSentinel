@@ -301,7 +301,7 @@
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('MissionvNetName'), '/',variables('MissionvNetName').UsersubnetName)]"
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('MissionvNetName'),variables('MissionvNetName').UsersubnetName)]"
             ],
             "properties": {
                 "mode": "Incremental",
