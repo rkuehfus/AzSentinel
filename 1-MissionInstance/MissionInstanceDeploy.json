@@ -176,7 +176,8 @@
             "name": "[concat(variables('MissionvNetName').MissionnsgName, '/', 'Microsoft.Insights/setForSecurity')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').MissionnsgName)]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').MissionnsgName)]",
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
             ],
             "properties": {
                 "workspaceId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.OperationalInsights/workspaces',variables('WorkspaceName'))]",
