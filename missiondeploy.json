@@ -59,7 +59,7 @@
                 "description": "Specify the region for your Workspace"
             }
         },
-        "MissonvNetName": {
+        "MissionvNetName": {
             "type": "string",
             "defaultValue": "MissionvNet",
             "metadata": {
@@ -112,8 +112,8 @@
                     "_artifactsLocation": {
                         "value": "[parameters('_artifactsLocation')]"
                     },
-                    "MissonvNetName": {
-                        "value": "[parameters('MissonvNetName')]"
+                    "MissionvNetName": {
+                        "value": "[parameters('MissionvNetName')]"
                     },
                     "UserVisibleResourceGroupName": {
                         "value": "[variables('UserVisibleResourceGroupName')]"

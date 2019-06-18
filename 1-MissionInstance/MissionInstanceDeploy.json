@@ -32,9 +32,9 @@
                 "description": ""
             }
         },
-        "MissonvNetName": {
+        "MissionvNetName": {
             "type": "string",
-            "defaultValue": "MissonvNetName",
+            "defaultValue": "MissionvNetName",
             "metadata": {
                 "description": ""
             }
@@ -60,7 +60,7 @@
         }
     },
     "variables": {
-        "MissonvNetName": {
+        "MissionvNetName": {
             "addressSpacePrefix": "10.0.0.0/16",
             "MissionsubnetName": "MissionSubnet",
             "MissionsubnetPrefix": "10.0.1.0/24",
@@ -108,7 +108,7 @@
         {
             "apiVersion": "2017-06-01",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('MissonvNetName').MissionnsgName]",
+            "name": "[variables('MissionvNetName').MissionnsgName]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
             ],
@@ -167,10 +167,10 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
             "apiVersion": "2017-05-01-preview",
-            "name": "[concat(variables('MissonvNetName').MissionnsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "name": "[concat(variables('MissionvNetName').MissionnsgName, '/', 'Microsoft.Insights/setForSecurity')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').MissionnsgName)]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').MissionnsgName)]"
             ],
             "properties": {
                 "workspaceId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.OperationalInsights/workspaces',variables('WorkspaceName'))]",
@@ -198,36 +198,36 @@
         {
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[parameters('MissonvNetName')]",
+            "name": "[parameters('MissionvNetName')]",
             "location": "[resourceGroup().location]",
             "comments": "This is the Mission vNet",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissonvNetName').MissionnsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissionvNetName').MissionnsgName)]",
                 "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]",
                 "[concat('Microsoft.Resources/deployments/', 'UserVisibleNSGdeployment')]"
             ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('MissonvNetName').addressSpacePrefix]"
+                        "[variables('MissionvNetName').addressSpacePrefix]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[variables('MissonvNetName').MissionsubnetName]",
+                        "name": "[variables('MissionvNetName').MissionsubnetName]",
                         "properties": {
-                            "addressPrefix": "[variables('MissonvNetName').MissionsubnetPrefix]",
+                            "addressPrefix": "[variables('MissionvNetName').MissionsubnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').MissionnsgName)]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').MissionnsgName)]"
                             }
                         }
                     },
                     {
-                        "name": "[variables('MissonvNetName').UsersubnetName]",
+                        "name": "[variables('MissionvNetName').UsersubnetName]",
                         "properties": {
-                            "addressPrefix": "[variables('MissonvNetName').UsersubnetPrefix]",
+                            "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').UsernsgName)]"
+                                "id": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
                             }
                         }
                     }
@@ -254,8 +254,8 @@
                     "_artifactsLocation": {
                         "value": "[parameters('_artifactsLocation')]"
                     },
-                    "MissonvNetName": {
-                        "value": "[parameters('MissonvNetName')]"
+                    "MissionvNetName": {
+                        "value": "[parameters('MissionvNetName')]"
                     },
                     "retentionPolicy": {
                         "value": "[parameters('retentionPolicy')]"

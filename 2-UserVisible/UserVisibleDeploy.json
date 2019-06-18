@@ -41,7 +41,7 @@
          }
     },
     "variables": {
-        "MissonvNetName": {
+        "MissionvNetName": {
             "addressSpacePrefix": "10.0.0.0/16",
             "MissionsubnetName": "MissionSubnet",
             "MissionsubnetPrefix": "10.0.1.0/24",
@@ -55,7 +55,7 @@
         {
             "apiVersion": "2017-06-01",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[concat(variables('MissonvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "name": "[concat(variables('MissionvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
@@ -114,10 +114,10 @@
         {
             "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
             "apiVersion": "2017-05-01-preview",
-            "name": "[concat(variables('MissonvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "name": "[concat(variables('MissionvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').UsernsgName)]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
             ],
             "properties": {
                 "workspaceId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.OperationalInsights/workspaces',parameters('WorkspaceName'))]",
