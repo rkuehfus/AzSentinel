@@ -61,7 +61,7 @@
         },
         "MissionvNetName": {
             "type": "string",
-            "defaultValue": "MissionvNet",
+            "defaultValue": "MissionvNetName",
             "metadata": {
                 "description": ""
             }
