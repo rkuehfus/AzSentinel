@@ -45,10 +45,10 @@
             "addressSpacePrefix": "10.0.0.0/16",
             "MissionsubnetName": "MissionSubnet",
             "MissionsubnetPrefix": "10.0.1.0/24",
-            "MissionnsgName": "MissionGWnsg",
-            "UsersubnetName": "UserFWSubnet",
+            "MissionnsgName": "Missionnsg",
+            "UsersubnetName": "UserSubnet",
             "UsersubnetPrefix": "10.0.2.0/24",
-            "UsernsgName": "UserFWnsg"
+            "UsernsgName": "Usernsg"
         }
     },
     "resources": [
