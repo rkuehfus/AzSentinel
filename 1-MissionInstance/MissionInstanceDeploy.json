@@ -271,6 +271,20 @@
                     }
                 }
             }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-07-01",
+            "name": "[concat(parameters('MissionvNetName'), '/',variables('MissionvNetName').UsersubnetName)]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'UserVisibleNSGdeployment')]"
+            ],
+            "properties": {
+                "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
+                "networkSecurityGroup": {
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('UserVisibleResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').UsernsgName)]"
+                }
+            }
         }
     ],
     "outputs": {
