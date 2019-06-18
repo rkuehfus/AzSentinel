@@ -151,14 +151,14 @@
         {
             "type": "Microsoft.Network/virtualNetworks/subnets",
             "apiVersion": "2018-07-01",
-            "name": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('MissionInstanceResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/' ,parameters('MissionvNetName'),'/subnets/',variables('MissionvNetName').UsersubnetName)]",
+            "name": "[concat(parameters('MissionvNetName'), '/',variables('MissionvNetName').UsersubnetName)]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
             ],
             "properties": {
                 "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
                 "networkSecurityGroup": {
-                    "id": "[concat('/subscriptions/',subscription().subscriptionId ,'/resourceGroups/',parameters('UserVisibleResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').UsernsgName)]"
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('UserVisibleResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').UsernsgName)]"
                 }
             }
         }
