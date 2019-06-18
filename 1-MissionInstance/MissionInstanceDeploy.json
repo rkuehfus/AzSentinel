@@ -127,7 +127,7 @@
                     {
                         "name": "ssh_rule",
                         "properties": {
-                            "description": "Allow WEB",
+                            "description": "Allow SSH",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
                             "destinationPortRange": "22",
