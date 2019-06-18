@@ -158,7 +158,7 @@
             "properties": {
                 "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId ,'/resourceGroups/',parameters('UserVisibleResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').UsernsgName)]"
                 }
             }
         }
