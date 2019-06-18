@@ -67,12 +67,12 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "ssh_rule",
+                        "name": "rdp_rule",
                         "properties": {
-                            "description": "Allow WEB",
+                            "description": "Allow RDP",
                             "protocol": "Tcp",
                             "sourcePortRange": "*",
-                            "destinationPortRange": "22",
+                            "destinationPortRange": "3389",
                             "sourceAddressPrefix": "Internet",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",

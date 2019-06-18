@@ -5,7 +5,7 @@
     "username": {
       "value": "vmadmin"
     },
-    "password": {
+    "adminPassword": {
       "reference": {
         "keyVault": {
           "id": "/subscriptions/8b2ef784-0c0d-424c-8a7a-aa1304a0366a/resourceGroups/p1MissionVaultRG/providers/Microsoft.KeyVault/vaults/p1MissionInstanceVault"

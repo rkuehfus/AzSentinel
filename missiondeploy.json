@@ -73,7 +73,7 @@
                 "description": "VM local administrator username"
             }
         },
-        "password": {
+        "adminPassword": {
             "type": "securestring",
             "metadata": {
                 "description": "VM local administrator password"

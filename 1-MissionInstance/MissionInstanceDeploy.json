@@ -58,11 +58,14 @@
                 "description": "Storage Account type"
             }
         },
-        "SecurityKeyVaultName": {
-            "type": "string",
+        "adminPassword": {
+            "type": "securestring",
             "metadata": {
-                "description": "Name of key vault created in deployment script"
+                "description": "VM local administrator password"
             }
+        },
+        "adminUsername": {
+            "type": "string"
         }
     },
     "variables": {
@@ -107,6 +110,12 @@
                     },
                     "storageAccountName": {
                         "value": "[variables('storageAccountName')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
                     }
                 }
             }
@@ -244,7 +253,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeploy.json')]",
+                    "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeployNSG.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -283,6 +292,51 @@
                 "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
                 "networkSecurityGroup": {
                     "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('UserVisibleResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').UsernsgName)]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "UserVisibledeploymentvm",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('MissionvNetName'), '/',variables('MissionvNetName').UsersubnetName)]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeployWin10.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "MissionvNetName": {
+                        "value": "[parameters('MissionvNetName')]"
+                    },
+                    "UserVisibleResourceGroupName": {
+                        "value": "[parameters('UserVisibleResourceGroupName')]"
+                    },
+                    "MissionInstanceResourceGroupName": {
+                        "value": "[parameters('MissionInstanceResourceGroupName')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[variables('WorkspaceName')]"
+                    },
+                    "envPrefixName": {
+                        "valie": "[parameters('envPrefixName')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    }
                 }
             }
         }

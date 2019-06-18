@@ -1,0 +1,167 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "MissionvNetName": {
+             "type": "string",
+             "defaultValue": "MissionvNet",
+             "metadata": {
+                 "description": "Name for Mission vNet"
+             }
+         },
+         "UserVisibleResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "MissionInstanceResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+         "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "WorkspaceName": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "envPrefixName": {
+            "type": "string",
+            "metadata": {
+                "description": "Prefix for the environment (2-5 characters)"
+            },
+            "defaultValue": "test",
+            "minLength": 2,
+            "maxLength": 5
+        },
+        "adminUsername": {
+            "type":"string"
+        },
+        "adminPassword": {
+            "type":"securestring"
+        }
+    },
+    "variables": {
+        "MissionvNetName": {
+            "addressSpacePrefix": "10.0.0.0/16",
+            "MissionsubnetName": "MissionSubnet",
+            "MissionsubnetPrefix": "10.0.1.0/24",
+            "MissionnsgName": "Missionnsg",
+            "UsersubnetName": "UserSubnet",
+            "UsersubnetPrefix": "10.0.2.0/24",
+            "UsernsgName": "Usernsg"
+        },
+        "networkInterfaceName": "[concat(parameters('envPrefixName'),'win10missionnic')]",
+        "publicIpAddressName": "[concat(parameters('envPrefixName'),'win10missionpip')]",
+        "virtualMachineName": "[concat(parameters('envPrefixName'),'win10missionvm')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "location": "[resourcegroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('MissionvNetName').UsersubnetName]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('UserVisibleResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').UsernsgName)]"
+                }
+            }
+        },
+        {
+            "name": "[variables('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "location": "[resourcegroup().location]",
+            "properties": {
+                "publicIpAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "name": "[variables('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "location": "[resourcegroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2_v3"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "microsoftvisualstudio",
+                        "offer": "Windows",
+                        "sku": "Windows-10-N-x64",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[variables('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true
+                    }
+                },
+                "licenseType": "Windows_Client",
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net/')]"
+                    }
+                }
+            }
+        }
+       
+    ],
+    "outputs": {}
+}
