@@ -226,15 +226,6 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').MissionnsgName)]"
                             }
                         }
-                    },
-                    {
-                        "name": "[variables('MissionvNetName').UsersubnetName]",
-                        "properties": {
-                            "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
-                            }
-                        }
                     }
                    
                 ]
@@ -247,7 +238,6 @@
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('MissionvNetName'))]"
             ],
             "properties": {
