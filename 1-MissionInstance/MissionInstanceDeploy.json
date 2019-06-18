@@ -291,7 +291,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "UserVisibledeploymentvm",
+            "name": "UserVisibledeploymentwin10",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
             "dependsOn": [
@@ -301,6 +301,51 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeployWin10.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "MissionvNetName": {
+                        "value": "[parameters('MissionvNetName')]"
+                    },
+                    "UserVisibleResourceGroupName": {
+                        "value": "[parameters('UserVisibleResourceGroupName')]"
+                    },
+                    "MissionInstanceResourceGroupName": {
+                        "value": "[parameters('MissionInstanceResourceGroupName')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[variables('WorkspaceName')]"
+                    },
+                    "envPrefixName": {
+                        "value": "[parameters('envPrefixName')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "MissionInstancedeploymentkali",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('MissionInstanceResourceGroupName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('MissionvNetName'),variables('MissionvNetName').MissionsubnetName)]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(parameters('_artifactsLocation'), '1-MissionInstance/MissionInstanceDeployKali.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {

@@ -1,0 +1,171 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "MissionvNetName": {
+             "type": "string",
+             "defaultValue": "MissionvNet",
+             "metadata": {
+                 "description": "Name for Mission vNet"
+             }
+         },
+         "UserVisibleResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "MissionInstanceResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+         "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "WorkspaceName": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "envPrefixName": {
+            "type": "string",
+            "metadata": {
+                "description": "Prefix for the environment (2-5 characters)"
+            },
+            "defaultValue": "test",
+            "minLength": 2,
+            "maxLength": 5
+        },
+        "adminUsername": {
+            "type":"string"
+        },
+        "adminPassword": {
+            "type":"securestring"
+        }
+    },
+    "variables": {
+        "MissionvNetName": {
+            "addressSpacePrefix": "10.0.0.0/16",
+            "MissionsubnetName": "MissionSubnet",
+            "MissionsubnetPrefix": "10.0.1.0/24",
+            "MissionnsgName": "Missionnsg",
+            "UsersubnetName": "UserSubnet",
+            "UsersubnetPrefix": "10.0.2.0/24",
+            "UsernsgName": "Usernsg"
+        },
+        "networkInterfaceName": "[concat(parameters('envPrefixName'),'kalimissionnic')]",
+        "publicIpAddressName": "[concat(parameters('envPrefixName'),'kalimissionpip')]",
+        "virtualMachineName": "[concat(parameters('envPrefixName'),'kalivm')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "location": "[resourcegroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('MissionInstanceResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/',parameters('MissionvNetName'),'/subnets/', variables('MissionvNetName').UsersubnetName)]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('MissionInstanceResourceGroupName'),'/providers/Microsoft.Network/networkSecurityGroups/',variables('MissionvNetName').MissionnsgName)]"
+                }
+            }
+        },
+        {
+            "name": "[variables('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "location": "[resourcegroup().location]",
+            "properties": {
+                "publicIpAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "name": "[variables('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "location": "[resourcegroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "plan": {
+                "name": "kali",
+                "product": "kali-linux",
+                "publisher": "kali-linux"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2_v3"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "kali-linux",
+                        "offer": "kali-linux",
+                        "sku": "kali",
+                        "version": "2019.2.0"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[variables('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false
+                    }
+                },
+                
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net/')]"
+                    }
+                }
+            }
+        }
+       
+    ],
+    "outputs": {}
+}
