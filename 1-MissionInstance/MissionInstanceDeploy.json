@@ -110,12 +110,6 @@
                     },
                     "storageAccountName": {
                         "value": "[variables('storageAccountName')]"
-                    },
-                    "adminUsername": {
-                        "value": "[parameters('adminUsername')]"
-                    },
-                    "adminPassword": {
-                        "value": "[parameters('adminPassword')]"
                     }
                 }
             }
