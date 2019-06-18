@@ -257,6 +257,9 @@
                     "MissionvNetName": {
                         "value": "[parameters('MissionvNetName')]"
                     },
+                    "UserVisibleResourceGroupName": {
+                        "value": "[parameters('UserVisibleResourceGroupName')]"
+                    },
                     "retentionPolicy": {
                         "value": "[parameters('retentionPolicy')]"
                     },
