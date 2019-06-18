@@ -63,9 +63,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "[variables('MissionvNetName').UsernsgName]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
-            ],
+            "dependsOn": [ ],
             "properties": {
                 "securityRules": [
                     {
