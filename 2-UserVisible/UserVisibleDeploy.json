@@ -21,6 +21,12 @@
                 "description": ""
             }
         },
+        "MissionInstanceResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
          "retentionPolicy": {
             "type": "int",
             "metadata": {
@@ -55,7 +61,7 @@
         {
             "apiVersion": "2017-06-01",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[concat(variables('MissionvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "name": "[variables('MissionvNetName').UsernsgName]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
@@ -140,6 +146,20 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-07-01",
+            "name": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('MissionInstanceResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/' ,parameters('MissionvNetName'),'/subnets/',variables('MissionvNetName').UsersubnetName)]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
+            ],
+            "properties": {
+                "addressPrefix": "[variables('MissionvNetName').UsersubnetPrefix]",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissionvNetName').UsernsgName)]"
+                }
             }
         }
     ],

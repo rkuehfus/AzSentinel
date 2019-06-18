@@ -118,6 +118,9 @@
                     "UserVisibleResourceGroupName": {
                         "value": "[variables('UserVisibleResourceGroupName')]"
                     },
+                    "MissionInstanceResourceGroupName": {
+                        "value": "[variables('MissionInstanceResourceGroupName')]"
+                    },
                     "envPrefixName": {
                         "value": "[parameters('envPrefixName')]"
                     },

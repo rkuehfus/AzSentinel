@@ -14,6 +14,12 @@
                 "description": ""
             }
         },
+        "MissionInstanceResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
         "retentionPolicy": {
             "type": "int",
             "metadata": {
@@ -203,8 +209,7 @@
             "comments": "This is the Mission vNet",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissionvNetName').MissionnsgName)]",
-                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]",
-                "[concat('Microsoft.Resources/deployments/', 'UserVisibleNSGdeployment')]"
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
             ],
             "properties": {
                 "addressSpace": {
@@ -242,7 +247,8 @@
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('MissionvNetName'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -259,6 +265,9 @@
                     },
                     "UserVisibleResourceGroupName": {
                         "value": "[parameters('UserVisibleResourceGroupName')]"
+                    },
+                    "MissionInstanceResourceGroupName": {
+                        "value": "[parameters('MissionInstanceResourceGroupName')]"
                     },
                     "retentionPolicy": {
                         "value": "[parameters('retentionPolicy')]"
