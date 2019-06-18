@@ -130,8 +130,11 @@
                     "WorkspaceLocation": {
                         "value": "[parameters('WorkspaceLocation')]"
                     },
-                    "SecurityKeyVaultName": {
-                        "value": "[parameters('SecurityKeyVaultName')]"
+                    "AdminUsername": {
+                        "value": "[parameters('username')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
                     }
                 }
             }
