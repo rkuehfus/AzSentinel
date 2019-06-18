@@ -1,0 +1,147 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "MissionvNetName": {
+             "type": "string",
+             "defaultValue": "MissionvNet",
+             "metadata": {
+                 "description": "Name for Mission vNet"
+             }
+         },
+         "UserVisibleResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+         "retentionPolicy": {
+            "type": "int",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "storageAccountName": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         },
+         "WorkspaceName": {
+            "type": "string",
+            "metadata": {
+                 "description": ""
+             }
+         }
+    },
+    "variables": {
+        "MissonvNetName": {
+            "addressSpacePrefix": "10.0.0.0/16",
+            "MissionsubnetName": "MissionSubnet",
+            "MissionsubnetPrefix": "10.0.1.0/24",
+            "MissionnsgName": "MissionGWnsg",
+            "UsersubnetName": "UserFWSubnet",
+            "UsersubnetPrefix": "10.0.2.0/24",
+            "UsernsgName": "UserFWnsg"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[concat(variables('MissonvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
+            ],
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow WEB",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "Allow_Internet",
+                        "properties": {
+                            "description": "Allow Internet",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Internet",
+                            "access": "Allow",
+                            "priority": 200,
+                            "direction": "Outbound"
+                        }
+                    },
+                    {
+                        "name": "azurestorageout",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Storage",
+                            "access": "Allow",
+                            "priority": 120,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "443",
+                                "80"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(variables('MissonvNetName').UsernsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').UsernsgName)]"
+            ],
+            "properties": {
+                "workspaceId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.OperationalInsights/workspaces',parameters('WorkspaceName'))]",
+                "storageAccountId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+                "logs": [
+                    {
+                        "category": "NetworkSecurityGroupEvent",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "days": "[parameters('retentionPolicy')]",
+                            "enabled": true
+                        }
+                    },
+                    {
+                        "category": "NetworkSecurityGroupRuleCounter",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "days": "[parameters('retentionPolicy')]",
+                            "enabled": true
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}

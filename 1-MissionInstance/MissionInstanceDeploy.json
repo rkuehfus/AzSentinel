@@ -1,0 +1,284 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "UserVisibleResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "retentionPolicy": {
+            "type": "int",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "envPrefixName": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "WorkspaceLocation": {
+            "type": "string",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "MissonvNetName": {
+            "type": "string",
+            "defaultValue": "MissonvNetName",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS",
+                "Premium_LRS"
+            ],
+            "metadata": {
+                "description": "Storage Account type"
+            }
+        },
+        "SecurityKeyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of key vault created in deployment script"
+            }
+        }
+    },
+    "variables": {
+        "MissonvNetName": {
+            "addressSpacePrefix": "10.0.0.0/16",
+            "MissionsubnetName": "MissionSubnet",
+            "MissionsubnetPrefix": "10.0.1.0/24",
+            "MissionnsgName": "MissionGWnsg",
+            "UsersubnetName": "UserFWSubnet",
+            "UsersubnetPrefix": "10.0.2.0/24",
+            "UsernsgName": "UserFWnsg"
+            
+        },
+        "WorkspaceName": "[concat(parameters('envPrefixName'),'LogAnalytics')]",
+        "storageAccountName": "[concat('diaglogs',uniquestring(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "LogAnalyticsDeployment",
+            "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
+            "dependsOn": [],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(parameters('_artifactsLocation'), '1-MissionInstance/LogAnalyticsDeploy.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "WorkspaceLocation": {
+                        "value": "[parameters('WorkspaceLocation')]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[variables('WorkspaceName')]"
+                    },
+                    "retentionPolicy": {
+                        "value": "[parameters('retentionPolicy')]"
+                    },
+                    "storageAccountType": {
+                        "value": "[parameters('storageAccountType')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('MissonvNetName').MissionnsgName]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Allow WEB",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "Allow_Internet",
+                        "properties": {
+                            "description": "Allow Internet",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Internet",
+                            "access": "Allow",
+                            "priority": 200,
+                            "direction": "Outbound"
+                        }
+                    },
+                    {
+                        "name": "azurestorageout",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Storage",
+                            "access": "Allow",
+                            "priority": 120,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "443",
+                                "80"
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/providers/diagnosticSettings",
+            "apiVersion": "2017-05-01-preview",
+            "name": "[concat(variables('MissonvNetName').MissionnsgName, '/', 'Microsoft.Insights/setForSecurity')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').MissionnsgName)]"
+            ],
+            "properties": {
+                "workspaceId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.OperationalInsights/workspaces',variables('WorkspaceName'))]",
+                "storageAccountId": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+                "logs": [
+                    {
+                        "category": "NetworkSecurityGroupEvent",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "days": "[parameters('retentionPolicy')]",
+                            "enabled": true
+                        }
+                    },
+                    {
+                        "category": "NetworkSecurityGroupRuleCounter",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "days": "[parameters('retentionPolicy')]",
+                            "enabled": true
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('MissonvNetName')]",
+            "location": "[resourceGroup().location]",
+            "comments": "This is the Mission vNet",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissonvNetName').MissionnsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissonvNetName').UsernsgName)]",
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('MissonvNetName').addressSpacePrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('MissonvNetName').MissionsubnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('MissonvNetName').MissionsubnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').MissionnsgName)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('MissonvNetName').UsersubnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('MissonvNetName').UsersubnetPrefix]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').UsernsgName)]"
+                            }
+                        }
+                    }
+                   
+                ]
+            },
+            "resources": []
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "UserVisibledeployment",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('MissonvNetName'))]",
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeploy.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "MissonvNetName": {
+                        "value": "[parameters('MissonvNetName')]"
+                    },
+                    "retentionPolicy": {
+                        "value": "[parameters('retentionPolicy')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    },
+                    "WorkspaceName": {
+                        "value": "[variables('WorkspaceName')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "storageAccountName": {
+            "type": "string",
+            "value": "[variables('storageAccountName')]"
+        },
+        "WorkspaceName": {
+            "type": "string",
+            "value": "[variables('WorkspaceName')]"
+        }
+    }
+}

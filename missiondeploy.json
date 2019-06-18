@@ -1,0 +1,143 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "_artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/rkuehfus/AzSentinel/master/"
+        },
+        "envPrefixName": {
+            "type": "string",
+            "metadata": {
+                "description": "Prefix for the environment (2-5 characters)"
+            },
+            "defaultValue": "test",
+            "minLength": 2,
+            "maxLength": 5
+        },
+        "SecurityKeyVaultName": {
+           "type": "string",
+           "metadata": {
+                "description": "Name of key vault created in deployment script"
+            }
+        },
+        "retentionPolicy": {
+            "type": "int",
+            "defaultValue": 30,
+            "maxValue": 700,
+            "metadata": {
+                 "description": "Number of days to retain diagnostic logs, zero stores the logs indefinitely"
+             }
+         },
+        "resourceGroupNames": {
+            "type": "array",
+            "defaultValue": [
+                "MissionInstanceRG",
+                "UserVisibleRG"
+            ],
+            "metadata": {
+                "description": "ResourceGroup Names"
+            }
+        },
+        "resourceGroupLocation": {
+            "type": "string",
+            "defaultValue": "eastus"
+        },
+        "WorkspaceLocation": {
+            "type": "string",
+            "defaultValue": "East US",
+            "allowedValues": [
+                "East US",
+                "West Europe",
+                "Southeast Asia",
+                "Australia Southeast"
+            ],
+            "metadata": {
+                "description": "Specify the region for your Workspace"
+            }
+        },
+        "MissonvNetName": {
+            "type": "string",
+            "defaultValue": "MissionvNet",
+            "metadata": {
+                "description": ""
+            }
+        },
+        "username": {
+            "type": "string",
+            "defaultValue": "vmadmin",
+            "metadata": {
+                "description": "VM local administrator username"
+            }
+        },
+        "password": {
+            "type": "securestring",
+            "metadata": {
+                "description": "VM local administrator password"
+            }
+        }
+    },
+    "variables": {
+        "MissionInstanceResourceGroupName": "[concat(parameters('envPrefixName'),parameters('resourceGroupNames')[0])]",
+        "UserVisibleResourceGroupName": "[concat(parameters('envPrefixName'),parameters('resourceGroupNames')[1])]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2018-05-01",
+            "location": "[parameters('resourceGroupLocation')]",
+            "name": "[concat(parameters('envPrefixName'),parameters('resourceGroupNames')[copyIndex()])]",
+            "copy": {
+                "name": "rgiterator",
+                "count": "[length(parameters('resourceGroupNames'))]"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "MissionDeployment",
+            "resourceGroup": "[variables('MissionInstanceResourceGroupName')]",
+            "dependsOn": [ ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(parameters('_artifactsLocation'), '1-MissionInstance/MissionInstanceDeploy.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "MissonvNetName": {
+                        "value": "[parameters('MissonvNetName')]"
+                    },
+                    "UserVisibleResourceGroupName": {
+                        "value": "[variables('UserVisibleResourceGroupName')]"
+                    },
+                    "envPrefixName": {
+                        "value": "[parameters('envPrefixName')]"
+                    },
+                    "retentionPolicy": {
+                        "value": "[parameters('retentionPolicy')]"
+                    },
+                    "WorkspaceLocation": {
+                        "value": "[parameters('WorkspaceLocation')]"
+                    },
+                    "SecurityKeyVaultName": {
+                        "value": "[parameters('SecurityKeyVaultName')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "UserVisibleResourceGroupName": {
+            "type": "string",
+            "value": "[variables('UserVisibleResourceGroupName')]"
+        }
+    }
+}
