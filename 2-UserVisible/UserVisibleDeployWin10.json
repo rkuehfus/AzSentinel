@@ -67,7 +67,7 @@
         },
         "networkInterfaceName": "[concat(parameters('envPrefixName'),'win10missionnic')]",
         "publicIpAddressName": "[concat(parameters('envPrefixName'),'win10missionpip')]",
-        "virtualMachineName": "[concat(parameters('envPrefixName'),'win10missionvm')]"
+        "virtualMachineName": "[concat(parameters('envPrefixName'),'win10vm')]"
     },
     "resources": [
         {
