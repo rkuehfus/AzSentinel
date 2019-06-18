@@ -323,7 +323,7 @@
                         "value": "[variables('WorkspaceName')]"
                     },
                     "envPrefixName": {
-                        "valie": "[parameters('envPrefixName')]"
+                        "value": "[parameters('envPrefixName')]"
                     },
                     "adminUsername": {
                         "value": "[parameters('adminUsername')]"
