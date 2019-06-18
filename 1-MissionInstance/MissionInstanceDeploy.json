@@ -203,8 +203,8 @@
             "comments": "This is the Mission vNet",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissonvNetName').MissionnsgName)]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('MissonvNetName').UsernsgName)]",
-                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
+                "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]",
+                "[concat('Microsoft.Resources/deployments/', 'UserVisibleNSGdeployment')]"
             ],
             "properties": {
                 "addressSpace": {
@@ -227,7 +227,7 @@
                         "properties": {
                             "addressPrefix": "[variables('MissonvNetName').UsersubnetPrefix]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').UsernsgName)]"
+                                "id": "[resourceId(parameters('UserVisibleResourceGroupName'),'Microsoft.Network/networkSecurityGroups', variables('MissonvNetName').UsernsgName)]"
                             }
                         }
                     }
@@ -238,11 +238,10 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "UserVisibledeployment",
+            "name": "UserVisibleNSGdeployment",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('MissonvNetName'))]",
                 "[concat('Microsoft.Resources/deployments/', 'LogAnalyticsDeployment')]"
             ],
             "properties": {
