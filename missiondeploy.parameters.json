@@ -8,7 +8,7 @@
     "adminPassword": {
       "reference": {
         "keyVault": {
-          "id": "/subscriptions/8b2ef784-0c0d-424c-8a7a-aa1304a0366a/resourceGroups/p1MissionVaultRG/providers/Microsoft.KeyVault/vaults/p1MissionInstanceVault"
+          "id": "/subscriptions/3b6f7be1-bacc-4e26-818f-7f541058d669/resourceGroups/play1MissionVaultRG/providers/Microsoft.KeyVault/vaults/play1MissionVault"
         },
         "secretName": "VMPassword"
       }

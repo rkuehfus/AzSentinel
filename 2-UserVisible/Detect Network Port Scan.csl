@@ -1,3 +1,3 @@
 AzureDiagnostics
 | where Type != "AzureMetric" and OperationName == "NetworkSecurityGroupCounters"
-| where type_s == "block" and direction_s == "In" and Resource == "USERNSG" 
+| where type_s == "block" and direction_s == "In" and Resource == "USERNSG" and ruleName_s == "UserRule_Block_MissionSubnet_all" 

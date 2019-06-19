@@ -1,13 +1,17 @@
-Connect-AzureRmAccount
+#Make sure you are connecting to the correct tenant and subscription in Azure.  Also send the context for the subscription. 
+Connect-AzAccount -Tenant '59be3e0c-c7bb-4d0f-9c6c-a22bc6f891b7' -SubscriptionId '3b6f7be1-bacc-4e26-818f-7f541058d669'
+$context = Get-AzSubscription -SubscriptionId '3b6f7be1-bacc-4e26-818f-7f541058d669'
+Set-AzContext $context
 
-#Step 1: Create ResourceGroup after updating the location to one of your choice. Use get-AzureRmLocation to see a list
-$envPrefixName = 'p1'
+#Step 1: Create ResourceGroup after updating the location to one of your choice. Use get-AzLocation to see a list
+#envPrefix needs to be between 2-5 char, all lowercase and no special char.
+$envPrefixName = 'play1'
 $SecurityResourceGroupName = $envPrefixName + 'MissionVaultRG'
 New-AzResourceGroup -Name $SecurityResourceGroupName -Location 'East US'
 $rg = get-Azresourcegroup -Name $SecurityResourceGroupName
 
 #Step 2: Create Key Vault and set flag to enable for template deployment with ARM
-$VaultName = $envPrefixName + 'MissionInstanceVault'
+$VaultName = $envPrefixName + 'MissionVault'
 New-AzKeyVault -VaultName $VaultName -ResourceGroupName $rg.ResourceGroupName -Location $rg.Location -EnabledForTemplateDeployment
 
 #Step 3: Add password as a secret.  Note:this will prompt you for a user and password.  User should be vmadmin and a password that meet the azure pwd police like P@ssw0rd123!!

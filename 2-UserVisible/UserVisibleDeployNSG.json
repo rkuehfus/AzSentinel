@@ -95,6 +95,23 @@
                         }
                     },
                     {
+                        "name": "Block_MissionSubnet_all",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "10.0.1.0/24",
+                            "destinationAddressPrefix": "10.0.2.0/24",
+                            "access": "Deny",
+                            "priority": 102,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
                         "name": "azurestorageout",
                         "properties": {
                             "provisioningState": "Succeeded",
