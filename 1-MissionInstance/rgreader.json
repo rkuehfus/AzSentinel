@@ -1,0 +1,16 @@
+{
+  "Name": "RG Player Read access",
+  "IsCustom": true,
+  "Description": "Player has read on Resource Group.",
+  "Actions": [
+    "*/read",
+    "Microsoft.OperationalInsights/workspaces/analytics/query/action",
+    "Microsoft.OperationalInsights/workspaces/search/action",
+    "Microsoft.Support/*"
+  ],
+  "NotActions": [
+  ],
+  "AssignableScopes": [
+    "/subscriptions/3b6f7be1-bacc-4e26-818f-7f541058d669/resourceGroups/play1UserVisibleRG"
+  ]
+}

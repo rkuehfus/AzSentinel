@@ -33,7 +33,7 @@ New-AzDeployment `
   -SecurityKeyVaultName $VaultName `
   -resourceGroupLocation eastus
 
-  #nmap 10.0.2.0/24 -Pn
+  #nmap 10.0.2.0/24 -Pn or sudo nmap -sT 10.0.2.4 -p-
 
 
   
