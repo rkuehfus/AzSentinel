@@ -5,17 +5,17 @@
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
-                 "description": ""
-             }
-         },
-         "MissionvNetName": {
-             "type": "string",
-             "defaultValue": "MissionvNet",
-             "metadata": {
-                 "description": "Name for Mission vNet"
-             }
-         },
-         "UserVisibleResourceGroupName": {
+                "description": ""
+            }
+        },
+        "MissionvNetName": {
+            "type": "string",
+            "defaultValue": "MissionvNet",
+            "metadata": {
+                "description": "Name for Mission vNet"
+            }
+        },
+        "UserVisibleResourceGroupName": {
             "type": "string",
             "metadata": {
                 "description": ""
@@ -27,19 +27,19 @@
                 "description": ""
             }
         },
-         "storageAccountName": {
+        "storageAccountName": {
             "type": "string",
             "metadata": {
-                 "description": ""
-             }
-         },
-         "WorkspaceName": {
+                "description": ""
+            }
+        },
+        "WorkspaceName": {
             "type": "string",
             "metadata": {
-                 "description": ""
-             }
-         },
-         "envPrefixName": {
+                "description": ""
+            }
+        },
+        "envPrefixName": {
             "type": "string",
             "metadata": {
                 "description": "Prefix for the environment (2-5 characters)"
@@ -49,10 +49,16 @@
             "maxLength": 5
         },
         "adminUsername": {
-            "type":"string"
+            "type": "string"
         },
         "adminPassword": {
-            "type":"securestring"
+            "type": "securestring"
+        },
+        "workspaceId": {
+            "type": "string"
+        },
+        "workspaceKey": {
+            "type": "string"
         }
     },
     "variables": {
@@ -67,7 +73,7 @@
         },
         "networkInterfaceName": "[concat(parameters('envPrefixName'),'srv12missionnic')]",
         "publicIpAddressName": "[concat(parameters('envPrefixName'),'srv12missionpip')]",
-        "virtualMachineName": "[concat(parameters('envPrefixName'),'srv12vm')]"
+        "UserSrv12VMName": "[concat(parameters('envPrefixName'),'srv12vm')]"
     },
     "resources": [
         {
@@ -111,7 +117,7 @@
             }
         },
         {
-            "name": "[variables('virtualMachineName')]",
+            "name": "[variables('UserSrv12VMName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
             "location": "[resourcegroup().location]",
@@ -144,7 +150,7 @@
                     ]
                 },
                 "osProfile": {
-                    "computerName": "[variables('virtualMachineName')]",
+                    "computerName": "[variables('UserSrv12VMName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -157,11 +163,11 @@
             }
         },
         {
-            "name": "[concat(parameters('envPrefixName'),'srv12/laPolicy')]",
+            "name": "[concat(variables('UserSrv12VMName'),'/laPolicy')]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('virtualMachineName'))]"
+                "[variables('UserSrv12VMName')]"
             ],
             "apiVersion": "2017-12-01",
             "properties": {
@@ -170,10 +176,10 @@
                 "typeHandlerVersion": "1.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "workspaceId": "[reference('LogAnalyticsDeployment').outputs.LAworkSpaceID.value]"
+                    "workspaceId": "[parameters('workspaceId')]"
                 },
                 "protectedSettings": {
-                    "workspaceKey": "[reference('LogAnalyticsDeployment').outputs.LAworkSpaceKey.value]"
+                    "workspaceKey": "[parameters('workspaceKey')]"
                 }
             }
         }

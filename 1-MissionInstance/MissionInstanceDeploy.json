@@ -80,7 +80,8 @@
             
         },
         "WorkspaceName": "[concat(parameters('envPrefixName'),'LogAnalytics')]",
-        "storageAccountName": "[concat('diaglogs',uniquestring(resourceGroup().id))]"
+        "storageAccountName": "[concat('diaglogs',uniquestring(resourceGroup().id))]",
+        "UserSrv12VMName": "[concat(parameters('envPrefixName'),'srv12vm')]"
     },
     "resources": [
         {
@@ -330,6 +331,12 @@
                     },
                     "adminPassword": {
                         "value": "[parameters('adminPassword')]"
+                    },
+                    "workspaceId": {
+                        "value": "[reference('LogAnalyticsDeployment').outputs.LAworkSpaceID.value]"
+                    },
+                    "workspaceKey": {
+                        "value": "[reference('LogAnalyticsDeployment').outputs.LAworkSpaceKey.value]"
                     }
                 }
             }
@@ -379,6 +386,7 @@
                 }
             }
         }
+        
     ],
     "outputs": {
         "storageAccountName": {
