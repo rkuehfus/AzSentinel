@@ -291,7 +291,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "UserVisibledeploymentwin10",
+            "name": "UserVisibledeploymentsrv12",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('UserVisibleResourceGroupName')]",
             "dependsOn": [
@@ -300,7 +300,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeployWin10.json')]",
+                    "uri": "[uri(parameters('_artifactsLocation'), '2-UserVisible/UserVisibleDeploySrv2012R2.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {

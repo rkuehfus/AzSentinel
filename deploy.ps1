@@ -33,7 +33,7 @@ New-AzDeployment `
   -SecurityKeyVaultName $VaultName `
   -resourceGroupLocation eastus
 
-  #"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('MissionInstanceResourceGroupName'),'/providers/Microsoft.Network/virtualNetworks/' ,parameters('MissionvNetName'),'/subnets/',variables('MissionvNetName').UsersubnetName)]",
+  #nmap 10.0.2.0/24 -Pn
 
 
   

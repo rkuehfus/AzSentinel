@@ -65,9 +65,9 @@
             "UsersubnetPrefix": "10.0.2.0/24",
             "UsernsgName": "Usernsg"
         },
-        "networkInterfaceName": "[concat(parameters('envPrefixName'),'win10missionnic')]",
-        "publicIpAddressName": "[concat(parameters('envPrefixName'),'win10missionpip')]",
-        "virtualMachineName": "[concat(parameters('envPrefixName'),'win10vm')]"
+        "networkInterfaceName": "[concat(parameters('envPrefixName'),'srv12missionnic')]",
+        "publicIpAddressName": "[concat(parameters('envPrefixName'),'srv12missionpip')]",
+        "virtualMachineName": "[concat(parameters('envPrefixName'),'srv12vm')]"
     },
     "resources": [
         {
@@ -124,15 +124,15 @@
                 },
                 "storageProfile": {
                     "osDisk": {
-                        "createOption": "fromImage",
+                        "createOption": "FromImage",
                         "managedDisk": {
                             "storageAccountType": "StandardSSD_LRS"
                         }
                     },
                     "imageReference": {
-                        "publisher": "microsoftvisualstudio",
-                        "offer": "Windows",
-                        "sku": "Windows-10-N-x64",
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2012-R2-Datacenter",
                         "version": "latest"
                     }
                 },
@@ -146,13 +146,8 @@
                 "osProfile": {
                     "computerName": "[variables('virtualMachineName')]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]",
-                    "windowsConfiguration": {
-                        "enableAutomaticUpdates": true,
-                        "provisionVmAgent": true
-                    }
+                    "adminPassword": "[parameters('adminPassword')]"
                 },
-                "licenseType": "Windows_Client",
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
@@ -160,8 +155,28 @@
                     }
                 }
             }
+        },
+        {
+            "name": "[concat(parameters('envPrefixName'),'srv12/laPolicy')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('virtualMachineName'))]"
+            ],
+            "apiVersion": "2017-12-01",
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "workspaceId": "[reference('LogAnalyticsDeployment').outputs.LAworkSpaceID.value]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[reference('LogAnalyticsDeployment').outputs.LAworkSpaceKey.value]"
+                }
+            }
         }
-       
     ],
     "outputs": {}
 }
