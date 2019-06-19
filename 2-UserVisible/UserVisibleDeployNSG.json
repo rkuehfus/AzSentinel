@@ -5,17 +5,17 @@
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
-                 "description": ""
-             }
-         },
-         "MissionvNetName": {
-             "type": "string",
-             "defaultValue": "MissionvNet",
-             "metadata": {
-                 "description": "Name for Mission vNet"
-             }
-         },
-         "UserVisibleResourceGroupName": {
+                "description": ""
+            }
+        },
+        "MissionvNetName": {
+            "type": "string",
+            "defaultValue": "MissionvNet",
+            "metadata": {
+                "description": "Name for Mission vNet"
+            }
+        },
+        "UserVisibleResourceGroupName": {
             "type": "string",
             "metadata": {
                 "description": ""
@@ -27,24 +27,24 @@
                 "description": ""
             }
         },
-         "retentionPolicy": {
+        "retentionPolicy": {
             "type": "int",
             "metadata": {
-                 "description": ""
-             }
-         },
-         "storageAccountName": {
+                "description": ""
+            }
+        },
+        "storageAccountName": {
             "type": "string",
             "metadata": {
-                 "description": ""
-             }
-         },
-         "WorkspaceName": {
+                "description": ""
+            }
+        },
+        "WorkspaceName": {
             "type": "string",
             "metadata": {
-                 "description": ""
-             }
-         }
+                "description": ""
+            }
+        }
     },
     "variables": {
         "MissionvNetName": {
@@ -63,7 +63,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "[variables('MissionvNetName').UsernsgName]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [ ],
+            "dependsOn": [],
             "properties": {
                 "securityRules": [
                     {
@@ -81,6 +81,41 @@
                         }
                     },
                     {
+                        "name": "Allow_Mission_Sub_to_Srv12VM",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "10.0.1.4",
+                            "destinationAddressPrefix": "10.0.2.4",
+                            "access": "Allow",
+                            "priority": 102,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Block_MissionSubnet_all",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "10.0.1.0/24",
+                            "destinationAddressPrefix": "10.0.2.0/24",
+                            "access": "Deny",
+                            "priority": 150,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
                         "name": "Allow_Internet",
                         "properties": {
                             "description": "Allow Internet",
@@ -95,23 +130,6 @@
                         }
                     },
                     {
-                        "name": "Block_MissionSubnet_all",
-                        "properties": {
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "10.0.1.0/24",
-                            "destinationAddressPrefix": "10.0.2.0/24",
-                            "access": "Deny",
-                            "priority": 102,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    },
-                    {
                         "name": "azurestorageout",
                         "properties": {
                             "provisioningState": "Succeeded",
@@ -120,7 +138,7 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "Storage",
                             "access": "Allow",
-                            "priority": 120,
+                            "priority": 220,
                             "direction": "Outbound",
                             "sourcePortRanges": [],
                             "destinationPortRanges": [
