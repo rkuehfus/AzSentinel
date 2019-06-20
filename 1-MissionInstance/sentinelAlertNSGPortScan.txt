@@ -1,0 +1,6 @@
+AzureDiagnostics
+| extend ingestTime = ingestion_time(),
+    nsgPayload = strcat_delim('',primaryIPv4Address_s, '|' , '/subscriptions/', SubscriptionId,'/resourceGroups/',tolower(ResourceGroup),'/providers/Microsoft.Network/networkSecurityGroups/',tolower(Resource))
+| where ruleName_s == 'UserRule_TripWire' and matchedConnections_d > 0
+| extend HostCustomEntity = nsgPayload
+| extend AccountCustomEntity = nsgPayload

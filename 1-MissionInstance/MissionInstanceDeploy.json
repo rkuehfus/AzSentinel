@@ -80,8 +80,7 @@
             
         },
         "WorkspaceName": "[concat(parameters('envPrefixName'),'LogAnalytics')]",
-        "storageAccountName": "[concat('diaglogs',uniquestring(resourceGroup().id))]",
-        "UserSrv12VMName": "[concat(parameters('envPrefixName'),'srv12vm')]"
+        "storageAccountName": "[concat('diaglogs',uniquestring(resourceGroup().id))]"
     },
     "resources": [
         {
